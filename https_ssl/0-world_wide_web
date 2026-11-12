@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Displays information about a domain's subdomains
+
+get_subdomain_info() {
+    domain=$1
+    subdomain=$2
+
+    result=$(dig "$subdomain.$domain" | awk '/ANSWER SECTION:/ { getline; print $4, $5 }')
+
+    record_type=$(echo "$result" | awk '{print $1}')
+    destination=$(echo "$result" | awk '{print $2}')
+
+    echo "The subdomain $subdomain is a $record_type record and points to $destination"
+}
+
+if [ "$#" -eq 2 ]; then
+    get_subdomain_info "$1" "$2"
+else
+    for subdomain in www lb-01 web-01 web-02
+    do
+        get_subdomain_info "$1" "$subdomain"
+    done
+fi
